@@ -65,7 +65,7 @@ class TestDns(unittest.TestCase):
         local_db = DnsDb()
         local_db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(local_db)
-        comp.set_dns_server("10.20.30.40")
+        comp.iface().set_dns_server("10.20.30.40")
 
         server = Comp()
         server_db = DnsDb()
@@ -82,7 +82,7 @@ class TestDns(unittest.TestCase):
     def test_wrong_addr_of_dns_server(self):
         comp = Comp()
         comp.set_dns_db(DnsDb())
-        comp.set_dns_server("10.20.30.45")
+        comp.iface().set_dns_server("10.20.30.45")
 
         net = Network()
         net.add_host(comp, "11.12.13.14")
@@ -95,7 +95,7 @@ class TestDns(unittest.TestCase):
         local_db = DnsDb()
         local_db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(local_db)
-        comp.set_dns_server("10.20.30.40")
+        comp.iface().set_dns_server("10.20.30.40")
 
         server = Comp()
         server_db = DnsDb()

@@ -10,7 +10,7 @@ class Network:
     def add_host(self, comp, addr):
         """Add host to net."""
         self.__hosts[addr] = comp
-        comp.set_net(self, addr)
+        comp.iface().setup(self, addr)
 
     def ping(self, src, dst):
         """Ping sends ping to host."""
