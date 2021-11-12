@@ -1,16 +1,16 @@
 import unittest
 from comp import Comp
-from net import Net
+from net import Network
 
 
-class TestNet(unittest.TestCase):
+class TestNetwork(unittest.TestCase):
     def test_empty(self):
-        net = Net()
+        net = Network()
         ans = net.ping("", "1.2.3.4")
         self.assertEqual(ans, "Unknown host")
 
     def test_ping_host_exists(self):
-        net = Net()
+        net = Network()
         comp1 = Comp()
         comp2 = Comp()
         net.add_host(comp1, "1.2.3.4")

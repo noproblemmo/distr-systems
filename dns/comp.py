@@ -1,4 +1,5 @@
-# TODO docs:
+"""Computer."""
+
 
 class NetworkInterface:
     """Network interface."""
@@ -14,11 +15,14 @@ class NetworkInterface:
         self.addr = addr
 
     def set_dns(self, addr):
-        # TODO docs:
+        """Set DNS server."""
         self.dns = addr
 
     def resolve(self, name):
-        # TODO docs:
+        """Resolve name."""
+        if not self.net:
+            return None
+
         return self.net.resolve(self.dns, name)
 
 
@@ -48,15 +52,12 @@ class Comp:
             if addr:
                 return addr
 
-        if not self.__iface.net:  # TODO: FIX
-            return None
-
         return self.__iface.resolve(name)
 
     def set_dns_db(self, db):
-        # TODO docs:
+        """Set DNS db."""
         self.__local_db = db
 
     def set_dns_server(self, addr):
-        # TODO ref: access to iface
+        """Set DNS server."""
         self.__iface.set_dns(addr)

@@ -1,7 +1,7 @@
 import unittest
 from comp import Comp
 from dns import DnsDb, Record
-from net import Net
+from net import Network
 
 
 class TestDnsDb(unittest.TestCase):
@@ -16,23 +16,15 @@ class TestDnsDb(unittest.TestCase):
     def test_get_addr_known(self):
         db = DnsDb()
         db.add_record(Record("narfu.ru", "1.2.3.4"))
-        addr = db.resolve("narfu.ru")
-        self.assertEqual(addr, "1.2.3.4")
-
-    def test_get_addr_known_2(self):
-        # TODO test, ref: merge with prev
-        db = DnsDb()
-        db.add_record(Record("narfu.ru", "2.3.4.5"))
-        addr = db.resolve("narfu.ru")
-        self.assertEqual(addr, "2.3.4.5")
+        db.add_record(Record("urfu.ru", "2.3.4.5"))
+        self.assertEqual(db.resolve("narfu.ru"), "1.2.3.4")
+        self.assertEqual(db.resolve("urfu.ru"), "2.3.4.5")
 
     def test_get_addr_unknown(self):
-        # TODO: implement
         db = DnsDb()
         db.add_record(Record("narfu.ru", "2.3.4.5"))
         db.add_record(Record("29.ru", "3.4.5.6"))
-        addr = db.resolve("narfu.com")
-        self.assertIsNone(addr)
+        self.assertEqual(db.resolve("narfu.com"), None)
 
     def test_same_addresses_differ_names(self):
         db = DnsDb()
@@ -48,10 +40,17 @@ class TestDnsDb(unittest.TestCase):
 
 
 class TestDns(unittest.TestCase):
-    def test_no_addr(self):
+    def test_no_local_dns_db(self):
         comp = Comp()
         ans = comp.resolve("narfu.ru")
-        self.assertEqual(ans, None)  # TODO ref: use standard error
+        self.assertEqual(ans, None)
+
+    def test_no_anwser_in_local_dv(self):
+        comp = Comp()
+        db = DnsDb()
+        db.add_record(Record("narfu.ru", "1.2.3.4"))
+        comp.set_dns_db(db)
+        self.assertIsNone(comp.resolve("narfu.com"))
 
     def test_answer_in_local_db(self):
         comp = Comp()
@@ -66,21 +65,46 @@ class TestDns(unittest.TestCase):
         local_db = DnsDb()
         local_db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(local_db)
-        # TODO ref: comp: set_dns_server: replace to network interface
         comp.set_dns_server("10.20.30.40")
-        # TODO test: no such host (dns server)
 
         server = Comp()
         server_db = DnsDb()
         server_db.add_record(Record("ya.ru", "2.3.4.5"))
         server.set_dns_db(server_db)
 
-        net = Net()
+        net = Network()
         net.add_host(comp, "11.12.13.14")
         net.add_host(server, "10.20.30.40")
 
         ans = comp.resolve("ya.ru")
         self.assertEqual(ans, "2.3.4.5")
 
-    # TODO test: comp: local db: resolve unknown name
-    # TODO feat: comp: ping name
+    def test_wrong_addr_of_dns_server(self):
+        comp = Comp()
+        comp.set_dns_db(DnsDb())
+        comp.set_dns_server("10.20.30.45")
+
+        net = Network()
+        net.add_host(comp, "11.12.13.14")
+
+        ans = comp.resolve("ya.ru")
+        self.assertIsNone(ans, None)
+
+    def test_resolve_unknown_name(self):
+        comp = Comp()
+        local_db = DnsDb()
+        local_db.add_record(Record("narfu.ru", "1.2.3.4"))
+        comp.set_dns_db(local_db)
+        comp.set_dns_server("10.20.30.40")
+
+        server = Comp()
+        server_db = DnsDb()
+        server_db.add_record(Record("ya.ru", "2.3.4.5"))
+        server.set_dns_db(server_db)
+
+        net = Network()
+        net.add_host(comp, "11.12.13.14")
+        net.add_host(server, "10.20.30.40")
+
+        ans = comp.resolve("ya.com")
+        self.assertEqual(ans, None)

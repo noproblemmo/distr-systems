@@ -2,7 +2,8 @@
 
 
 class Record:
-    """DNS record."""
+    """Single DNS record."""
+
     def __init__(self, name, addr):
         self.__name = name
         self.__addr = addr
@@ -13,11 +14,10 @@ class Record:
     def get_addr(self):
         return self.__addr
 
-    # TODO feat: ? + update_record()
-
 
 class DnsDb:
     """DNS database."""
+
     def __init__(self):
         self.__records = {}
         self.__addrs = {}

@@ -1,7 +1,8 @@
-# TODO docs:
+"""Computer network."""
 
-class Net:
-    """Net represents net."""
+
+class Network:
+    """Network represents net."""
 
     def __init__(self):
         self.__hosts = {}
@@ -19,7 +20,6 @@ class Net:
         return "Unknown host"
 
     def resolve(self, dns_addr, name):
-        # TODO test: no host
         try:
             return self.__hosts[dns_addr].resolve(name)
         except KeyError:
