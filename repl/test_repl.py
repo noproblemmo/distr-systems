@@ -43,7 +43,44 @@ class TestDistrDb(unittest.TestCase):
         db = DistrDb()
         db.add_record(Record(1))
         db.add_record(Record(2))
+        db.sync()
         self.assertEqual(db.records_num(), 2)
         self.assertEqual(len(db.get_all()), 2)
         self.assertIsNotNone(db.get_record(1))
         self.assertIsNone(db.get_record(3))
+
+    def test_get_databases(self):
+        db = DistrDb()
+        self.assertIsNotNone(db.get_main())
+        self.assertIsNotNone(db.get_repl())
+
+    def test_add_record(self):
+        db = DistrDb()
+        db.add_record(Record(1))
+        self.assertEqual(db.get_main().records_num(), 1)
+        self.assertEqual(db.get_repl().records_num(), 0)
+
+    def test_add_record_and_sync(self):
+        db = DistrDb()
+        db.add_record(Record(1))
+        self.assertEqual(db.get_main().records_num(), 1)
+        db.sync()
+        self.assertEqual(db.get_repl().records_num(), 1)
+
+    def test_sync_twice(self):
+        db = DistrDb()
+        db.add_record(Record(1))
+        self.assertEqual(db.get_main().records_num(), 1)
+        db.sync()
+        db.sync()
+
+    def test_read_data_sync(self):
+        db = DistrDb()
+        db.add_record(Record(1))
+        db.sync()
+        self.assertIsNotNone(db.get_record(1))
+
+    def test_read_data_no_sync(self):
+        db = DistrDb()
+        db.add_record(Record(1))
+        self.assertIsNotNone(db.get_record(1))
