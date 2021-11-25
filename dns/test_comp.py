@@ -1,9 +1,9 @@
 import unittest
-from comp import Comp
+from nice import *
 
 
 class TestComp(unittest.TestCase):
     def test_no_ping(self):
-        comp = Comp()
+        comp = compsys.Comp()
         ans = comp.iface().ping("1.2.3.4")
         self.assertEqual(ans, "No network")

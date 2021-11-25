@@ -1,7 +1,6 @@
 import unittest
-from comp import Comp
 from dns import DnsDb, Record
-from net import Network
+from nice import *
 
 
 class TestDnsDb(unittest.TestCase):
@@ -41,19 +40,19 @@ class TestDnsDb(unittest.TestCase):
 
 class TestDns(unittest.TestCase):
     def test_no_local_dns_db(self):
-        comp = Comp()
+        comp = compsys.Comp()
         ans = comp.resolve("narfu.ru")
         self.assertEqual(ans, None)
 
-    def test_no_anwser_in_local_dv(self):
-        comp = Comp()
+    def test_no_anwser_in_local_db(self):
+        comp = compsys.Comp()
         db = DnsDb()
         db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(db)
         self.assertIsNone(comp.resolve("narfu.com"))
 
     def test_answer_in_local_db(self):
-        comp = Comp()
+        comp = compsys.Comp()
         db = DnsDb()
         db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(db)
@@ -61,18 +60,18 @@ class TestDns(unittest.TestCase):
         self.assertEqual(ans, "1.2.3.4")
 
     def test_answer_from_dns_server(self):
-        comp = Comp()
+        comp = compsys.Comp()
         local_db = DnsDb()
         local_db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(local_db)
         comp.iface().set_dns_server("10.20.30.40")
 
-        server = Comp()
+        server = compsys.Comp()
         server_db = DnsDb()
         server_db.add_record(Record("ya.ru", "2.3.4.5"))
         server.set_dns_db(server_db)
 
-        net = Network()
+        net = compsys.Network()
         net.add_host(comp, "11.12.13.14")
         net.add_host(server, "10.20.30.40")
 
@@ -80,29 +79,29 @@ class TestDns(unittest.TestCase):
         self.assertEqual(ans, "2.3.4.5")
 
     def test_wrong_addr_of_dns_server(self):
-        comp = Comp()
+        comp = compsys.Comp()
         comp.set_dns_db(DnsDb())
         comp.iface().set_dns_server("10.20.30.45")
 
-        net = Network()
+        net = compsys.Network()
         net.add_host(comp, "11.12.13.14")
 
         ans = comp.resolve("ya.ru")
         self.assertIsNone(ans, None)
 
     def test_resolve_unknown_name(self):
-        comp = Comp()
+        comp = compsys.Comp()
         local_db = DnsDb()
         local_db.add_record(Record("narfu.ru", "1.2.3.4"))
         comp.set_dns_db(local_db)
         comp.iface().set_dns_server("10.20.30.40")
 
-        server = Comp()
+        server = compsys.Comp()
         server_db = DnsDb()
         server_db.add_record(Record("ya.ru", "2.3.4.5"))
         server.set_dns_db(server_db)
 
-        net = Network()
+        net = compsys.Network()
         net.add_host(comp, "11.12.13.14")
         net.add_host(server, "10.20.30.40")
 
