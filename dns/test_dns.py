@@ -1,5 +1,5 @@
 import unittest
-from dns import DnsDb, Record
+from dns import *
 from nice import *
 
 
@@ -107,3 +107,28 @@ class TestDns(unittest.TestCase):
 
         ans = comp.resolve("ya.com")
         self.assertEqual(ans, None)
+        
+    def test_recursive_dns_request(self):
+        comp = compsys.Comp()
+        local_db = DnsDb()
+        local_db.add_record(Record("narfu.ru", "1.2.3.4"))
+        comp.set_dns_db(local_db)
+        comp.iface().set_dns_server("10.20.30.40")
+
+        server = compsys.Comp()
+        server_db = DnsDb()
+        server_db.add_record(Record("ya.ru", "2.3.4.5"))
+        server.set_dns_db(server_db)
+        
+        server2 = compsys.Comp()
+        server_db2 = DnsDb()
+        server_db2.add_record(Record("vk.com", "9.9.9.9"))
+        server.set_dns_db(server_db2)
+
+        net = compsys.Network()
+        net.add_host(comp, "11.12.13.14")
+        net.add_host(server, "10.20.30.40")
+        net.add_host(server2, "20.30.40.50")
+
+        ans = comp.resolve("vk.com")
+        self.assertEqual(ans, "9.9.9.9")

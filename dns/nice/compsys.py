@@ -92,7 +92,8 @@ class Network:
             return f"ping from {src} to {dst}"
 
         return "Unknown host"
-
+    
+    #Recursive request
     def resolve(self, dns_addr, name):
         try:
             return self.__hosts[dns_addr].resolve(name)
