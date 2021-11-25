@@ -119,16 +119,22 @@ class TestDns(unittest.TestCase):
         server_db = DnsDb()
         server_db.add_record(Record("ya.ru", "2.3.4.5"))
         server.set_dns_db(server_db)
+        comp.iface().set_dns_server("20.30.40.50")
         
         server2 = compsys.Comp()
         server_db2 = DnsDb()
         server_db2.add_record(Record("vk.com", "9.9.9.9"))
-        server.set_dns_db(server_db2)
+        server2.set_dns_db(server_db2)
 
         net = compsys.Network()
         net.add_host(comp, "11.12.13.14")
         net.add_host(server, "10.20.30.40")
         net.add_host(server2, "20.30.40.50")
+        
+        comp.iface().setup(net, "11.12.13.14")
+        server.iface().setup(net, "10.20.30.40")
+        server2.iface().setup(net, "20.30.40.50")
 
         ans = comp.resolve("vk.com")
         self.assertEqual(ans, "9.9.9.9")
+        
