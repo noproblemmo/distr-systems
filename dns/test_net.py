@@ -23,4 +23,13 @@ class TestNetwork(unittest.TestCase):
         ans = comp1.iface().ping("3.4.5.6")
         self.assertEqual(ans, "Unknown host")
         
+    def test_seniding_messages(self):
+        net = compsys.Network()
+        comp1 = compsys.Comp()
+        comp2 = compsys.Comp()
+        net.add_host(comp1, "1.2.3.4")
+        net.add_host(comp2, "2.3.4.5")
+                
+        net.set_msgbuf(comp1.iface().sendMessage("Hi, buddy!", "2.3.4.5"))
         
+        self.assertEqual(comp2.iface().readMessage(net.messagebuffer), "\"Hi, buddy!\" from 1.2.3.4")  

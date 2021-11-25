@@ -8,6 +8,7 @@ class NetworkInterface:
         self.net = None
         self.addr = None
         self.dns = None
+        self.msg = None
 
     def setup(self, net, addr):
         """Set net and address to interface."""
@@ -29,8 +30,17 @@ class NetworkInterface:
         if not self.net:
             return None
         return self.net.resolve(self.dns, name)
-
-
+    
+    def sendMessage(self, data, dst):
+        message = [data, self.addr, dst]
+        return message
+        
+    def readMessage(self, message):
+        if(message[2] == self.addr):
+            return f"\"{message[0]}\" from {message[1]}"
+        else:
+            return "No messages"
+        
 class Comp:
     """Computer."""
     def __init__(self):
@@ -53,7 +63,8 @@ class Comp:
     def set_dns_db(self, db):
         """Set DNS db."""
         self.__local_db = db
-
+    
+    
 
 """Computer network."""
 
@@ -63,6 +74,12 @@ class Network:
 
     def __init__(self):
         self.__hosts = {}
+        messagebuffer = None
+        
+    def set_msgbuf(self, message):
+        """Message buffer"""
+        if message: 
+           self.messagebuffer = message
 
     def add_host(self, comp, addr):
         """Add host to net."""
@@ -81,3 +98,5 @@ class Network:
             return self.__hosts[dns_addr].resolve(name)
         except KeyError:
             return None
+    
+    
