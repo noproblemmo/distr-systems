@@ -30,6 +30,20 @@ class NetworkInterface:
         if not self.net:
             return None
         return self.net.resolve(self.dns, name)
+        
+    def resolveNonRec(self, dns, name):
+        """Resolve name."""
+        if not self.net:
+            return None
+        
+        ans = self.net.resolveNonRec(dns, name)
+        
+        if ans[1] == "IP":
+            return ans
+            
+        if ans[1] == "DNS":
+            ans = self.resolveNonRec(ans[0], name)
+            return ans
     
     def sendMessage(self, data, dst):
         message = [data, self.addr, dst]
@@ -50,7 +64,10 @@ class Comp:
     def iface(self):
         """Return network interface."""
         return self.__iface
-
+    
+    def localDb(self):
+        return self.__local_db
+    
     def resolve(self, name):
         """Resolve name."""
         if self.__local_db:
@@ -59,6 +76,16 @@ class Comp:
                 return addr
 
         return self.__iface.resolve(name)
+        
+    def resolveNonRec(self, name):
+        """Resolve name."""
+        if self.__local_db:
+            addr = self.__local_db.resolve(name)
+            if addr: 
+                return addr
+    
+        ans = self.__iface.resolveNonRec(self.iface().dns, name)
+        return ans[0]
 
     def set_dns_db(self, db):
         """Set DNS db."""
@@ -93,11 +120,23 @@ class Network:
 
         return "Unknown host"
     
-    #Recursive request
+    #Recursive DNS
     def resolve(self, dns_addr, name):
         try:
             return self.__hosts[dns_addr].resolve(name)
         except KeyError:
             return None
+        """Must return IP root DNS or IP"""    
+    def resolveNonRec(self, dns_addr, name):
+            
+        if self.__hosts[dns_addr].localDb().resolve(name):
+            addr = self.__hosts[dns_addr].localDb().resolve(name)
+            if addr: 
+                ans = [addr, "IP"]
+                return ans
+                
+        ans = [self.__hosts[dns_addr].iface().dns, "DNS"]
+        
+        return ans
     
     
