@@ -35,12 +35,9 @@ class NetworkInterface:
         """Resolve name."""
         if not self.net:
             return None
-        
         ans = self.net.resolveNonRec(dns, name)
-        
         if ans[1] == "IP":
             return ans
-            
         if ans[1] == "DNS":
             ans = self.resolveNonRec(ans[0], name)
             return ans
@@ -74,7 +71,6 @@ class Comp:
             addr = self.__local_db.resolve(name)
             if addr:
                 return addr
-
         return self.__iface.resolve(name)
         
     def resolveNonRec(self, name):
@@ -83,7 +79,6 @@ class Comp:
             addr = self.__local_db.resolve(name)
             if addr: 
                 return addr
-    
         ans = self.__iface.resolveNonRec(self.iface().dns, name)
         return ans[0]
 
@@ -117,7 +112,6 @@ class Network:
         """Ping sends ping to host."""
         if dst in self.__hosts:
             return f"ping from {src} to {dst}"
-
         return "Unknown host"
     
     #Recursive DNS
@@ -126,7 +120,8 @@ class Network:
             return self.__hosts[dns_addr].resolve(name)
         except KeyError:
             return None
-        """Must return IP root DNS or IP"""    
+     
+    #NonRecursive DNS
     def resolveNonRec(self, dns_addr, name):
             
         if self.__hosts[dns_addr].localDb().resolve(name):
@@ -134,9 +129,7 @@ class Network:
             if addr: 
                 ans = [addr, "IP"]
                 return ans
-                
         ans = [self.__hosts[dns_addr].iface().dns, "DNS"]
-        
         return ans
     
     
