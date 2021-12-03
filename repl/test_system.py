@@ -1,6 +1,7 @@
 import unittest
 from record import Record
 from system import System
+from db import *
 
 
 class TestSystem(unittest.TestCase):
@@ -100,3 +101,15 @@ class TestSystem_Stats(unittest.TestCase):
         stats = system.stats()
         self.assertEqual(stats['main'], 0)
         self.assertEqual(stats['repl'], [5, 5])
+    
+class Test_Broken_System(unittest.TestCase):
+    def test_broke_main_db(self):
+        system = System(2)
+        system.sync()
+        system.get_main().broke_db()
+        
+        for i in range(10):
+            system.add_record(Record(i))
+        
+        for i in range(10):
+            self.assertIsNotNone(system.get_record(i))

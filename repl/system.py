@@ -40,12 +40,17 @@ class System:
         return self.__main.add_record(rec)
 
     def get_record(self, record_id):
+        """If main DB is broken then change this with repl"""
+        cond = self.__main.get_condition()
+        if(cond == True):
+            swap_main_db()
         """Get record by ID."""
         rec = self.__repls[self.__ind].get_record(record_id)
         self.__stats['repl'][self.__ind] += 1
         self.__update_ind()
         if rec:
             return rec
+        self.sync()
         return self.__main.get_record(record_id)
 
     def get_all(self):
@@ -61,9 +66,18 @@ class System:
 
     def __update_ind(self):
         self.__ind = (self.__ind + 1) % len(self.__repls)
-
-
+    
+    def swap_main_db(self):
+        for repl in self.__repls:
+            if (repl.get_condition == False):
+                self.__main, repl = repl, self.__main
+                break
+                
+        raise ValueError("There are no working DB")
+               
 def _sync(src, dst):
+    if dst.get_condition == True:
+        return 0
     records = src.get_all()
     for rec_id, rec in records.items():
         if not dst.get_record(rec_id):

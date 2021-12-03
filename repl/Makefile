@@ -4,5 +4,5 @@ test:
 	nose2 --with-coverage
 
 todo:
-	@rgrep --include "*.py" "TODO" || true
-	@rgrep --include "*.py" "REF" || true
+	@rgrep --include "*.py" "TODO" || True
+	@rgrep --include "*.py" "REF" || True
