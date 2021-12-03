@@ -103,7 +103,17 @@ class TestSystem_Stats(unittest.TestCase):
         self.assertEqual(stats['repl'], [5, 5])
     
 class Test_Broken_System(unittest.TestCase):
-    def test_broke_main_db(self):
+    def test_broke_main_db_before_sync(self): 
+        system = System(2)
+        system.get_main().broke_db()
+        
+        for i in range(10):
+            system.add_record(Record(i))
+        
+        for i in range(10):
+            self.assertIsNotNone(system.get_record(i))
+            
+    def test_broke_main_db_after_sync(self):
         system = System(2)
         system.sync()
         system.get_main().broke_db()
@@ -113,3 +123,57 @@ class Test_Broken_System(unittest.TestCase):
         
         for i in range(10):
             self.assertIsNotNone(system.get_record(i))
+        
+        self.assertIsNone(system.get_record(11))
+        
+    def test_swap_main_db(self):
+        system = System(2)
+        system.add_record(Record(1))
+        system.sync()
+        
+        for _ in range(10):
+            system.get_record(1)
+            
+        self.assertEqual(system.get_main().get_condition(), False)
+            
+        system.get_main().broke_db()
+        
+        self.assertEqual(system.get_main().get_condition(), True)
+        
+        system.get_record(1)
+        
+        self.assertEqual(system.get_main().get_condition(), False)
+        
+        self.assertEqual(system.get_repl(0).get_condition(), True)
+        
+        stats = system.stats()
+        self.assertEqual(stats['main'], 5)
+        self.assertEqual(stats['repl'], [0, 6])
+        
+        system.get_record(1)
+        
+        self.assertEqual(stats['main'], 5)
+        self.assertEqual(stats['repl'], [0, 7])
+        
+'''           
+    def test_broke_main_db2(self):
+        system = System(2)
+        system.sync()
+        system.get_main().broke_db()
+        
+        for i in range(10):
+            system.add_record(Record(i))
+        
+        for i in range(10):
+            self.assertIsNotNone(system.get_record(i)) 
+ 
+    def test_broke_main_db3(self):
+        system = System(2)
+        system.get_main().broke_db()
+        
+        for i in range(10):
+            system.add_record(Record(i))
+        
+        for i in range(10):
+            self.assertIsNotNone(system.get_record(i))
+'''
