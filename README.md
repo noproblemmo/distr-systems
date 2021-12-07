@@ -31,7 +31,7 @@
 * [Шардирование vs репликация: масштабируем БД](https://zen.yandex.ru/media/id/5af88d8c482677990692cd7c/shardirovanie-vs-replikaciia-masshtabiruem-bd-5cfb901e83e84200af3e1dfa)
 * [Путеводитель по репликации баз данных](https://habr.com/ru/post/514500/)
 
-## 4. Шардирование
+## 4. Шардирование (In progress)
 
 Разработать прототип системы с шардированием. Показать в тестах штатный режим работы (запись и использование данных), и поломки.
 
@@ -41,16 +41,27 @@
 * [Теория шардирования](https://habr.com/ru/company/oleg-bunin/blog/433370/)
 * [Шардирование баз данных](https://ru.bmstu.wiki/%D0%A8%D0%B0%D1%80%D0%B4%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%B1%D0%B0%D0%B7_%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85)
 
-## 5. Блокчейн
+## 5. BitTorrent
+
+Разработать прототип пиринговой системы для обмена файлами в соотвествии с основными принципами работы протокола BitTorrent. Реализовать работу с трекером. Использовать базовую библиотеку.
+
+Ссылки:
+
+* [Как работают торренты и насколько это законно](https://club.dns-shop.ru/blog/t-326-internet/44272-kak-rabotaut-torrentyi-i-naskolko-eto-zakonno/)
+* [BitTorrent](https://ru.bmstu.wiki/BitTorrent)
+
+## 5.5. Распределенная хеш-таблица
+
+Разработать код, объясняющий, что такое распределенная хеш-таблица. Показать добавление, поиск и перераспределение данных.
+
+* [Распределённая хеш-таблица](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%91%D0%BD%D0%BD%D0%B0%D1%8F_%D1%85%D0%B5%D1%88-%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B0)
+* [Distributed Hash Tables, Part I](https://www.linuxjournal.com/article/6797)
+* [Простое базовое объяснение распределенной таблицы Hash (DHT)](https://coderoad.ru/144360/%D0%9F%D1%80%D0%BE%D1%81%D1%82%D0%BE%D0%B5-%D0%B1%D0%B0%D0%B7%D0%BE%D0%B2%D0%BE%D0%B5-%D0%BE%D0%B1%D1%8A%D1%8F%D1%81%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D0%BE%D0%B9-%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D1%8B-Hash-DHT)
+* [Протокол DHT](http://translatedby.com/you/protocol-dht/)
+
+## 6. Блокчейн
 
 Разработать прототип блокчейн-системы. Материалы [How to Build a Blockchain in Python](https://www.activestate.com/blog/how-to-build-a-blockchain-in-python/) и [Блокчейн на Python](https://habr.com/ru/company/ruvds/blog/589371/) дают хорошее представление о принципах работы блокчейна.
 
 При разворачивании системы на "компьютерах" базовой библиотеки (задача 1) полезно разобрать материал [Создаем Blockchain с нуля на Python](https://python-scripts.com/blockchain). Если такое разворачивание покажется трудным или бессмысленным, то можно повторить
 реализацию с Flask. Это будет очень полезно с точки зрения освоения технологий.
-
-## 6. BitTorrent
-
-Ссылки:
-
-* [Как работают торренты и насколько это законно ](https://club.dns-shop.ru/blog/t-326-internet/44272-kak-rabotaut-torrentyi-i-naskolko-eto-zakonno/)
-* [BitTorrent](https://ru.bmstu.wiki/BitTorrent)
