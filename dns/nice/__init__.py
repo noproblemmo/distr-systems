@@ -1,1 +1,1 @@
-from . import compsys
+from . import *
