@@ -69,6 +69,8 @@ class NetworkInterface:
             return "No network"
         return self.net.ping(self.addr, addr)
 
+    #Methods for net interractoion with DNS server
+
     def resolve(self, name):
         """Resolve name."""
         if not self.net:
@@ -85,6 +87,8 @@ class NetworkInterface:
         if ans[1] == "DNS":
             ans = self.resolveNonRec(ans[0], name)
             return ans
+            
+    #Methods for communication of 2 computers (Sendig messages or *files)
     
     def sendMessage(self, data, dst):
         message = [data, self.addr, dst]
@@ -101,7 +105,8 @@ class FileSystem:
     """The file system stub."""
 
     def __init__(self):
-        self.__files = ["file1.txt", "file2.txt"]
+        self.__files = ["file1.txt", "file2.txt", "Presentation.pdf"]
+        #Space is NONE mb?
         self.__space = 12345
 
     def files(self):
@@ -149,6 +154,8 @@ class Comp:
     def set_dns_db(self, db):
         """Set DNS db."""
         self.__local_db = db    
+        
+    #Services interaction
 
     def send_request(self, dst, name, command, *args):
         """Send to destination (dst) some (name) request with command
@@ -228,6 +235,8 @@ class Clock(Service):
         return "Unknown command"
 
 
+# Take it out to tests
+'''
 def main():
     """Run example."""
 
@@ -249,3 +258,4 @@ def main():
 
 if __name__ != "__main__": ## "!=" - Main disable, "==" - Main enable
     main()
+'''

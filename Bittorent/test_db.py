@@ -16,8 +16,8 @@ class TestDatabase(unittest.TestCase):
     def test_add_same_record_twice(self):
         db = Database()
         db.add_record(Record(1))
-        #with self.assertRaises(ValueError):
-        #    db.add_record(Record(1))
+        with self.assertRaises(ValueError):
+            db.add_record(Record(1))
 
     def test_get_record_exists(self):
         db = Database()
