@@ -291,6 +291,14 @@ class Bittorrent(Service):
 
     def handle_request(self, command, *args):
         if command == "download":
+            if len(args) != 2:
+                print("""
+Request error! The query should look like the following:
+--------------------------------------------
+com.send_request(server, \"bittorrent\", \"download\", \"Spider-man: No way to home\", comp)
+--------------------------------------------
+Where comp is the ID of your computer
+""")
             if args[0]:
                 fileDB = self.__comp.file_system().file_location()
                 if args[0] in fileDB:
