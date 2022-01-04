@@ -105,7 +105,10 @@ class FileSystem:
     """The file system stub."""
 
     def __init__(self):
-        self.__files = ["Win32.dll", "calc.exe"]
+        #Name of files
+        self.__files = {"Win32.dll":"Win32.dll", "calc.exe":"calc.exe", "SIMS 4":"0xSIMS 4"}
+        #Entity of these files
+        self.__filesEntity = {"SIMS 4":"0xSIMS4"}
         
         self.__locationFiles =  {   
                                     "Archive":  {
@@ -119,6 +122,10 @@ class FileSystem:
     def files(self):
         """Return the list of files."""
         return self.__files
+        
+    def filesEntity(self):
+        """Return the list of entity of files."""
+        return self.__filesEntity
 
     def space(self):
         """Return the free space in storage."""
@@ -126,8 +133,12 @@ class FileSystem:
        
         """Add file in local file storage"""
     def add_file(self, file):
-        self.files().append(file)
-    
+        #self.files().append(file)
+        if file[0] in self.files():
+            self.files()[file[0]][file[1][0]] = file[1][1]
+        else:
+            self.files()[file[0]] = file[1]
+        
     def add_file_location(self, key, value):
         self.__locationFiles[key] = value
         
@@ -305,18 +316,22 @@ Where comp is the ID of your computer
                     print(f"File \"{args[0]}\" was found in Torrent web!\nStart downloading...")
                     print(f"Bittable: {fileDB[args[0]]}")
                     
-                    fileInfo = fileDB[args[0]]
+                    fileInfo = fileDB[args[0]] #Dict with info about parts of whole file 
                     keys = list(fileInfo.keys())
+                    
+                    args[1].send_request(args[1], "files", "add", [args[0], {}])
                     
                     for key in keys:
                         print(f"Recieving file \"{key}\"...")
-                        if key in fileInfo[key].file_system().files():
-                            fileInfo[key].send_request(args[1], "files", "add", key)
+                        """If file is in local strage of 1 of seed's"""
+                        seedStorage = fileInfo[key].file_system().files()
+                        if key in seedStorage:
+                            fileInfo[key].send_request(args[1], "files", "add", [args[0], [key, seedStorage[key]]])
                         else:
                             print(f"File \"{key}\" missing!")
                 else:
                     return f"File \"{args[0]}\" not found!"
-                    
+                
                 return f"File \"{args[0]}\" succesfully dowloaded"
 
             return "Wrong args"
@@ -359,9 +374,8 @@ def main():
     
     server.send_request(server, "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":slave_1, "2 fragment":slave_2})
     
-    server.send_request(slave_1, "files", "add", "1 fragment")
-    server.send_request(slave_2, "files", "add", "2 fragment")
-    
+    server.send_request(slave_1, "files", "add", ["1 fragment", "0x1_fragment"])
+    server.send_request(slave_2, "files", "add", ["2 fragment", "0x2_fragment"])
     print()
     
     print("--------------------------")
