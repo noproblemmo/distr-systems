@@ -9,11 +9,15 @@ class Network:
     def __init__(self):
         self.__hosts = {}
         messagebuffer = None
+        self.__arpTable = {} #Table with IP addresses 
         
     def set_msgbuf(self, message):
         """Message buffer"""
         if message: 
            self.messagebuffer = message
+           
+    def hosts(self):
+        return self.__hosts
 
     def add_host(self, comp, addr):
         """Add host to net."""
@@ -25,6 +29,10 @@ class Network:
         if dst in self.__hosts:
             return f"ping from {src} to {dst}"
         return "Unknown host"
+    
+    def resolveIP(self, ip):
+        if self.hosts()[ip]:
+            return self.hosts()[ip]
     
     #Recursive DNS
     def resolve(self, dns_addr, name):
@@ -50,10 +58,11 @@ class NetworkInterface:
 
     def __init__(self):
         self.net = None
-        self.addr = None
+        self.addr = None #Self IP address 
         self.dns = None
         self.msg = None
-
+        self.__arpTable = {} #Table with IP addresses 
+        
     def setup(self, net, addr):
         """Set net and address to interface."""
         self.net = net
@@ -106,9 +115,7 @@ class FileSystem:
 
     def __init__(self):
         #Name of files
-        self.__files = {"Win32.dll":"Win32.dll", "calc.exe":"calc.exe", "SIMS 4":"0xSIMS 4"}
-        #Entity of these files
-        self.__filesEntity = {"SIMS 4":"0xSIMS4"}
+        self.__files = {"Win32.dll":"Win32.dll", "calc.exe":"calc.exe", "SIMS 4":"0xSIMS4"}
         
         self.__locationFiles =  {   
                                     "Archive":  {
@@ -117,15 +124,12 @@ class FileSystem:
                                                 }
                                 }
         #Space is NONE mb?
+        #TODO: Add feature / Add file's sizes
         self.__space = 12345
 
     def files(self):
         """Return the list of files."""
         return self.__files
-        
-    def filesEntity(self):
-        """Return the list of entity of files."""
-        return self.__filesEntity
 
     def space(self):
         """Return the free space in storage."""
@@ -184,11 +188,17 @@ class Comp:
         
     #Services interaction
 
-    def send_request(self, dst, name, command, *args):
+    def send_request(self, dstip, name, command, *args):
         """Send to destination (dst) some (name) request with command
         and optional args."""
-        ans = dst.handlers[name](command, *args)
-        print(ans)
+        #IP must be an IP address!
+        
+        dstpc = self.iface().net.resolveIP(dstip)
+        if dstpc:
+            ans = dstpc.handlers[name](command, *args)
+            print(ans)
+        else: 
+            return f"There is not {dstip} IP address"
 
     def add_service(self, srv):
         """Add service to computer."""
@@ -319,7 +329,9 @@ Where comp is the ID of your computer
                     fileInfo = fileDB[args[0]] #Dict with info about parts of whole file 
                     keys = list(fileInfo.keys())
                     
-                    args[1].send_request(args[1], "files", "add", [args[0], {}])
+                    pc = self.__comp.iface().net.resolveIP(args[1])
+                    
+                    pc.send_request(args[1], "files", "add", [args[0], {}])
                     
                     for key in keys:
                         print(f"Recieving file \"{key}\"...")
@@ -367,31 +379,31 @@ def main():
     slave_2.add_service(Bittorrent(slave_2))
     slave_2.add_service(Files(slave_2))
     
-    comp.send_request(server, "files", "list")
-    comp.send_request(server, "files", "list", "flocation")
+    comp.send_request("92.163.4.113", "files", "list")
+    comp.send_request("92.163.4.113", "files", "list", "flocation")
     
     #server.send_request(server, "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":"92.168.0.113", "2 fragment":"56.128.128.143"})
     
-    server.send_request(server, "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":slave_1, "2 fragment":slave_2})
+    server.send_request("92.163.4.113", "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":slave_1, "2 fragment":slave_2})
     
-    server.send_request(slave_1, "files", "add", ["1 fragment", "0x1_fragment"])
-    server.send_request(slave_2, "files", "add", ["2 fragment", "0x2_fragment"])
+    server.send_request("92.168.0.113", "files", "add", ["1 fragment", "0x1_fragment"])
+    server.send_request("56.128.128.143", "files", "add", ["2 fragment", "0x2_fragment"])
     print()
     
     print("--------------------------")
     
-    slave_1.send_request(slave_1, "files", "list")
-    slave_2.send_request(slave_2, "files", "list")
+    slave_1.send_request("92.168.0.113", "files", "list")
+    slave_2.send_request("56.128.128.143", "files", "list")
     
-    slave_1.send_request(slave_1, "files", "list", "flocation")
-    slave_2.send_request(slave_2, "files", "list", "flocation")
+    slave_1.send_request("92.168.0.113", "files", "list", "flocation")
+    slave_2.send_request("56.128.128.143", "files", "list", "flocation")
     
     #Bitrequest prototype
     print("----Bitrequest testing----")
 
-    comp.send_request(server, "bittorrent", "download", "Spider-man: No way to home", comp)
+    comp.send_request("92.163.4.113", "bittorrent", "download", "Spider-man: No way to home", "124.56.91.119")
     
-    comp.send_request(comp, "files", "list")
+    comp.send_request("124.56.91.119", "files", "list")
     
 """
     comp1 = Comp()
