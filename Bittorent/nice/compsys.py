@@ -157,6 +157,7 @@ class Comp:
         self.__fs = FileSystem()
         self.__iface = NetworkInterface()
         self.__local_db = None
+        self.__condition = True
         
     def iface(self):
         """Return network interface."""
@@ -172,6 +173,15 @@ class Comp:
             if addr:
                 return addr
         return self.__iface.resolve(name)
+        
+    def turnOn(self):
+        self.__condition = True
+        
+    def shutDown(self):
+        self.__condition = False
+        
+    def getCondition(self):
+        return self.__condition
         
     def resolveNonRec(self, name):
         """Resolve name."""
@@ -334,11 +344,28 @@ Where comp is the ID of your computer
                     pc.send_request(args[1], "files", "add", [args[0], {}])
                     
                     for key in keys:
-                        print(f"Recieving file \"{key}\"...")
+                        print(f"Trying to recieve file \"{key}\"...")
                         """If file is in local strage of 1 of seed's"""
-                        seedStorage = fileInfo[key].file_system().files()
+                        
+                        if isinstance(fileInfo[key], str):
+                            seed = self.__comp.iface().net.resolveIP(fileInfo[key])
+                            if seed.getCondition() == True:
+                                    print(f"Recieving file \"{key}\" from {fileInfo[key]}")
+                            else:
+                                print(f"Host {fileInfo[key]} is unavailable")
+                            
+                        else:
+                            for i in range(len(fileInfo[key])):
+                                seed = self.__comp.iface().net.resolveIP(fileInfo[key][i])
+                                if seed.getCondition() == True:
+                                    print(f"Recieving file \"{key}\" from {fileInfo[key][i]}")
+                                    break
+                                print(f"Host {fileInfo[key][i]} is unavailable")
+                        
+                        seedStorage = seed.file_system().files()
+                        
                         if key in seedStorage:
-                            fileInfo[key].send_request(args[1], "files", "add", [args[0], [key, seedStorage[key]]])
+                            seed.send_request(args[1], "files", "add", [args[0], [key, seedStorage[key]]])
                         else:
                             print(f"File \"{key}\" missing!")
                 else:
@@ -379,17 +406,22 @@ def main():
     slave_2.add_service(Bittorrent(slave_2))
     slave_2.add_service(Files(slave_2))
     
+    slave_3.add_service(Bittorrent(slave_3))
+    slave_3.add_service(Files(slave_3))
+    
     comp.send_request("92.163.4.113", "files", "list")
     comp.send_request("92.163.4.113", "files", "list", "flocation")
     
-    #server.send_request(server, "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":"92.168.0.113", "2 fragment":"56.128.128.143"})
+    #server.send_request("92.163.4.113", "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":"92.168.0.113", "2 fragment":"56.128.128.143"})
     
-    server.send_request("92.163.4.113", "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":slave_1, "2 fragment":slave_2})
+    server.send_request("92.163.4.113", "files", "add", "flocation", "Spider-man: No way to home", {"1 fragment":"92.168.0.113", "2 fragment":["56.128.128.143", "97.15.15.3"]})
     
     server.send_request("92.168.0.113", "files", "add", ["1 fragment", "0x1_fragment"])
     server.send_request("56.128.128.143", "files", "add", ["2 fragment", "0x2_fragment"])
     print()
+    server.send_request("97.15.15.3", "files", "add", ["2 fragment", "0x2_fragment"])
     
+    print()
     print("--------------------------")
     
     slave_1.send_request("92.168.0.113", "files", "list")
@@ -400,6 +432,8 @@ def main():
     
     #Bitrequest prototype
     print("----Bitrequest testing----")
+
+    slave_2.shutDown()
 
     comp.send_request("92.163.4.113", "bittorrent", "download", "Spider-man: No way to home", "124.56.91.119")
     
